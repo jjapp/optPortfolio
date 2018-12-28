@@ -22,3 +22,55 @@ These three data sources were combined to form a single time series with the fol
 
 ## Selecting Options Contracts to Purchase
 
+There are two components of holding costs associated with a long option contract.  The first is time decay.  The second is the lost interest from holding a T-Bill instead of a more expensive option.  In general, the cost from time decay is higher than the opportunity cost of holding an option.  The chart below shows holding costs by days until expiration for a representative call option.
+
+![holdingCost](/home/appertjt/Documents/Grad School/Thesis/Chap2LeveragedPortfolio/code/holdingCost.png)
+
+We will plan on purchasing options that are 200 days until expiration to mimic the long S&P portion of the portfolio.  We will sell any option that reaches 30 days to expiration and is still in inventory.
+
+## Managing the Portfolio
+
+### Step 1
+
+Calculate total portfolio value.  This will be the combined value of the T-Bill portion and the current value of the options.  The combined value times the desired leverage equals "targetDelta".
+
+Returns:  targetDelta
+
+### Step 2a:  Non rebalance days
+
+Save total value of portfolio.  Calculate daily returns.  Calculate options statistics.
+
+### Step 2b:  Rebalance days
+
+Compare current option inventory delta to targetDelta.  If option delta is too high we sell the oldest option/s until the actual delta is less than 50 delta from targetDelta.
+
+If option inventory delta is more than 50 delta below targetDelta purchase at the money calls at least 200 days out until actual delta is less than 50 delta from targetDelta.
+
+Save total value of portfolio.  Calculate daily returns.  Calculate options statistics.
+
+## System Design
+
+### Inventory Class
+
+Description:  Holds the options in the portfolio.
+
+Methods:
+
+* Add option
+* Remove option
+* Calculate Inventory Delta
+* Calculate Inventory Theta
+* Remove/Replace aged inventory.
+
+### Option Class
+
+* Create Option
+* Get Price
+* Get Theta
+* Get Delta
+* Get age
+
+### Cash Class
+
+### Portfolio Class
+
