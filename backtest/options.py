@@ -25,6 +25,7 @@ class Option:
         self.stock=new_stock
         self.volatility=new_vol
         days_left=(self.exDate-today).days
+
         position=self.direction
 
         c=m.BS([self.stock, self.strike, self.interest, days_left],
@@ -42,6 +43,9 @@ class Option:
         options_dict={"price": price, "theta": theta, "delta": delta}
 
         return options_dict
+
+    def get_exDate(self):
+        return self.exDate
 
 
 class Position:
@@ -62,6 +66,10 @@ class Position:
             pos_dict['delta']=pos_dict['delta']+y['delta']
 
         return pos_dict
+
+    def getPosEx(self):
+        option1=self.option_list[0]
+        return option1.get_exDate()
 
 class Inventory:
     '''The inventory class holds positions in options.'''
@@ -97,3 +105,12 @@ class Inventory:
         inv_dict={"price": price, "delta": delta, "theta": theta}
 
         return inv_dict
+
+    def sellExpirContracts(self, today):
+        for row in self.position_list:
+            exDate=row.getPosEx()
+            days_left=(exDate-today).days
+            if days_left<50:
+                self.position_list.pop(0)
+            else:
+                continue
