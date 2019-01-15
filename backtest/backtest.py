@@ -4,7 +4,7 @@ from datetime import timedelta, date
 import datetime
 
 ####Note:  system status 1 means you're using puts and calls
-system_status=0
+system_status=1#1 is synthetic stocks, 0 is calls only
 
 #read in data set
 
@@ -62,7 +62,7 @@ def getSynthStock(tgt, date, dte, vol, interest, strike, stock):
     inventory=options.Inventory()
     i=0
     if system_status==1:
-        tgt_factor=(tgt)/100
+        tgt_factor=((tgt)/100)#adding leverage
     else:
         tgt_factor=tgt/50
 
@@ -107,7 +107,7 @@ def initiate_sim(df):
     strike=getStrike(stock)
 
     #build the portfolio
-    inventory=getSynthStock(tgt, today,200, vol, interest, strike, stock)
+    inventory=getSynthStock(tgt, today,400, vol, interest, strike, stock)
 
     return (inventory)
 
@@ -162,13 +162,14 @@ def run_sim(df):
 
 
         #get new target delta
-        tgtdelta=df.iloc[i]['portfolio']/stock
+        tgtdelta=(df.iloc[i]['portfolio']/stock)#adding leverage
 
-        tgt=getTargetDelta(tgtdelta)
-        df.at[i, 'tgtdelta']=tgt
+        #tgt=getTargetDelta(tgtdelta)
+        df.at[i, 'tgtdelta']=tgtdelta
         df.at[i, 'delta']=delta
 
-        gap=tgt-delta
+        gap=tgtdelta-delta
+
 
         #set up portfolio rebalance
 
@@ -179,7 +180,6 @@ def run_sim(df):
         if gap>100:
 
             call=options.Option(exDate, vol, strike, stock, "Call", interest, 1)
-            #uncomment if using puts too
             put=options.Option(exDate, vol, strike, stock, "Put", interest, -1)
             if system_status==1:
                 pos_list=[call, put]
@@ -191,6 +191,7 @@ def run_sim(df):
             #add the position to Inventory
 
             y.add_position(pos)
+
         elif gap<-100:
             y.sell_position()
         else:
